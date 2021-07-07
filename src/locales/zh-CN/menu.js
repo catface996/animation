@@ -54,5 +54,8 @@ export default {
   'menu.algorithm.sort.bubble': '冒泡排序',
   'menu.algorithm.sort.insert': '插入排序',
   'menu.algorithm.sort.select': '选择排序',
+  'menu.algorithm.sort.quick': '快速排序',
+  'menu.algorithm.sort.merge': '归并排序',
+  'menu.algorithm.sort.heap': '堆排序',
   'menu.algorithm.heap': '堆',
 };

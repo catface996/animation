@@ -1,5 +1,5 @@
 import {PageContainer} from '@ant-design/pro-layout';
-import {Card, Row, Col, Grid, Button} from 'antd';
+import {Card, Row, Col, Button} from 'antd';
 import React, {Component} from 'react';
 import styles from './index.less';
 import {StepForwardOutlined, PlayCircleOutlined, PauseCircleOutlined, RedoOutlined} from '@ant-design/icons';
@@ -10,9 +10,10 @@ let i = 0;
 let j = 0;
 let p = 0;
 let auto;
+// eslint-disable-next-line no-unused-vars
 const sleep = (numberMillis) => {
     let now = new Date();
-    let exitTime = now.getTime() + numberMillis;
+    const exitTime = now.getTime() + numberMillis;
     while (true) {
         now = new Date();
         if (now.getTime() > exitTime)
