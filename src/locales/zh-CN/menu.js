@@ -49,4 +49,10 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
+  'menu.algorithm': '算法',
+  'menu.algorithm.sort': '排序',
+  'menu.algorithm.sort.bubble': '冒泡排序',
+  'menu.algorithm.sort.insert': '插入排序',
+  'menu.algorithm.sort.select': '选择排序',
+  'menu.algorithm.heap': '堆',
 };

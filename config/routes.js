@@ -22,25 +22,36 @@ export default [
     component: './Welcome',
   },
   {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
+    path: "/algorithm",
+    name: "algorithm",
+    icon: "crown",
     routes: [
       {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
+        path: "/algorithm/sort",
+        name: "sort",
+        icon: "smile",
+        routes: [
+          {
+            path: "/algorithm/sort/bubble",
+            name: "bubble",
+            icon: "smile",
+            component: "./algorithm/sort/bubble",
+          },
+          {
+            path: "/algorithm/sort/insert",
+            name: "insert",
+            icon: "smile",
+            component: "./algorithm/sort/insert",
+          },
+          {
+            path: "/algorithm/sort/select",
+            name: "select",
+            icon: "smile",
+            component: "./algorithm/sort/select",
+          },
+        ],
       },
     ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
   },
   {
     path: '/',

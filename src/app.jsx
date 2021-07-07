@@ -19,7 +19,37 @@ export const initialStateConfig = {
 export async function getInitialState() {
   const fetchUserInfo = async () => {
     try {
-      const currentUser = await queryCurrentUser();
+      const currentUser = {
+        "name": "游客",
+        "avatar": "string",
+        "userid": "string",
+        "email": "string",
+        "signature": "string",
+        "title": "string",
+        "group": "string",
+        "tags": [
+          {
+            "key": "string",
+            "label": "string"
+          }
+        ],
+        "notifyCount": 0,
+        "unreadCount": 0,
+        "country": "string",
+        "access": "string",
+        "geographic": {
+          "province": {
+            "label": "string",
+            "key": "string"
+          },
+          "city": {
+            "label": "string",
+            "key": "string"
+          }
+        },
+        "address": "string",
+        "phone": "string"
+      };
       return currentUser;
     } catch (error) {
       history.push(loginPath);
