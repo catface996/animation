@@ -6,244 +6,293 @@ import {StepForwardOutlined, PlayCircleOutlined, PauseCircleOutlined, RedoOutlin
 
 
 let that;
-let i = 0;
-let j = 0;
-let p = 0;
 let auto;
-const sleep = (numberMillis) => {
-    let now = new Date();
-    let exitTime = now.getTime() + numberMillis;
-    while (true) {
-        now = new Date();
-        if (now.getTime() > exitTime)
-            return;
-    }
-}
+let cur = 0;
+const initStep = {
+  arr: [],
+  currentIndex: 0,
+  fixIndex: 0,
+  minIndex: -1,
+  minValue: -1,
+  choose: false,
+  change: false,
+  swap: false,
+};
 
 class Bubble extends Component {
-    state = {
-        arr: [],
-        canNext: true,
-        canAuto: true,
-        canStop: false,
-    };
+  state = {
+    originArr: [],
+    process: [],
+    currentStep: {
+      arr: [],
+      currentIndex: 0,
+      fixIndex: 0,
+      minIndex: -1,
+      minValue: -1,
+      choose: false,
+      change: false,
+      swap: false,
+    },
+    canNext: true,
+    canAuto: true,
+    canStop: false,
+  };
 
 
-    /**
-     * 构造函数
-     * @param props
-     * @param context
-     */
-    constructor(props, context) {
-        super(props, context);
-        that = this;
+  /**
+   * 构造函数
+   * @param props
+   * @param context
+   */
+  constructor(props, context) {
+    super(props, context);
+    that = this;
+  }
+
+
+  /**
+   * 组件第一次渲染完成，此时dom节点已经生成，可以在这里调用ajax请求，返回数据setState后组件会重新渲染
+   */
+  componentDidMount() {
+    this.newRound();
+  }
+
+  /**
+   * 在此处完成组件的卸载和数据的销毁。
+   * clear你在组建中所有的setTimeout,setInterval
+   * 移除所有组建中的监听 removeEventListener
+   */
+  componentWillUnmount() {
+
+  }
+
+
+  newRound() {
+    cur = 0;
+    const temp = [];
+    const sortArr = [];
+    for (let x = 0; x < 10; x += 1) {
+      const node1 = {};
+      const node2 = {};
+      const value = Math.floor(Math.random() * 100);
+      node1.value = value;
+      node1.position = x;
+      node2.value = value;
+      node2.position = x;
+      temp.push(node1);
+      sortArr.push(node2);
     }
-
-
-    /**
-     * componentWillMount()一般用的比较少，它更多的是在服务端渲染时使用。
-     * 它代表的过程是组件已经经历了constructor()初始化数据后，但是还未渲染DOM时。
-     */
-    componentWillMount() {
-        this.newRound();
-    }
-
-    /**
-     * 组件第一次渲染完成，此时dom节点已经生成，可以在这里调用ajax请求，返回数据setState后组件会重新渲染
-     */
-    componentDidMount() {
-    }
-
-    /**
-     * 在接受父组件改变后的props需要重新渲染组件时用到的比较多
-     * 接受一个参数nextProps
-     * 通过对比nextProps和this.props，将nextProps的state为当前组件的state，从而重新渲染组件
-     * @param nextProps
-     */
-    componentWillReceiveProps() {
-        // console.log('componentWillReceiveProps', nextProps)
-    }
-
-    /**
-     * 在此处完成组件的卸载和数据的销毁。
-     * clear你在组建中所有的setTimeout,setInterval
-     * 移除所有组建中的监听 removeEventListener
-     */
-    componentWillUnmount() {
-    }
-
-    /*
-     * componentWillUpdate (nextProps,nextState)
-     * shouldComponentUpdate返回true以后，组件进入重新渲染的流程，进入componentWillUpdate,这里同样可以拿到nextProps和nextState。
-     * componentDidUpdate(prevProps,prevState)
-     * 组件更新完毕后，react只会在第一次初始化成功会进入componentDidmount,之后每次重新渲染后都会进入这个生命周期，
-     * 这里可以拿到prevProps和prevState，即更新前的props和state。
-     */
-
-    newRound() {
-        let temp = new Array();
-        for (let i = 0; i < 10; i++) {
-            let node = {
-                value: 0,
-                choose: 0
-            };
-            node.value = Math.floor(Math.random() * 100);
-            temp[i] = node;
+    const processArr = [];
+    let minIndex = 0;
+    let processNode = {};
+    processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, 0, 0, false, false, false);
+    for (let k = 0; k < sortArr.length; k += 1) {
+      minIndex = k;
+      let l = k;
+      for (; l < sortArr.length; l += 1) {
+        processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k, true, false, false);
+        processArr.push(processNode);
+        if (sortArr[l].value < sortArr[minIndex].value) {
+          minIndex = l;
+          processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k, false, true, false);
+          processArr.push(processNode);
+        } else {
+          processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k, false, false, false);
+          processArr.push(processNode);
         }
-        i = temp.length - 1;
-        j = 0;
-        p = 0;
-        that.setState({
-            arr: temp
-        });
-        that.stopAutoRun();
+      }
+      // 交换 k位置和minIndex位置,标注要交换的位置
+      processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k, false, false, true);
+      processArr.push(processNode);
+      // 实施交换
+      if (minIndex === k) {
+        processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k + 1, false, false, false);
+        processArr.push(processNode);
+      } else {
+        processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k + 1, false, false, false);
+        const {value} = sortArr[k];
+        sortArr[k].value = sortArr[minIndex].value;
+        sortArr[minIndex].value = value;
+        processNode = this.buildProcessNode(this.copySortArr(sortArr), minIndex, l, k + 1, false, false, false);
+        processArr.push(processNode);
+      }
     }
+    this.setState({
+      originArr: temp,
+      process: processArr,
+      currentStep: initStep,
+      canNext: true,
+      canAuto: true,
+      canStop: false,
+    });
+  }
 
-    autoRun() {
-        auto = setInterval(that.nextStep, 500);
-        that.setState({
-            canNext: false,
-            canAuto: false,
-            canStop: true,
-        });
+  buildProcessNode(arr, minIndex, currentIndex, fixIndex, choose, change, swap) {
+    const processNode = {};
+    processNode.arr = arr;
+    processNode.currentIndex = currentIndex;
+    processNode.fixIndex = fixIndex;
+    processNode.minIndex = minIndex;
+    processNode.choose = choose;
+    processNode.change = change;
+    processNode.swap = swap;
+    processNode.minValue = arr[minIndex].value;
+    return processNode;
+  }
+
+  copySortArr(sortArr) {
+    const targetArr = [];
+    for (let k = 0; k < sortArr.length; k += 1) {
+      const node = {};
+      node.value = sortArr[k].value;
+      node.position = sortArr[k].position;
+      targetArr.push(node);
     }
+    return targetArr;
+  }
 
-    stopAutoRun() {
-        if (auto !== undefined) {
-            clearInterval(auto);
-            auto = undefined;
+  nextStep() {
+    const tempProcess = that.state.process.slice();
+    if (cur >= tempProcess.length) {
+      that.stopAll();
+    } else {
+      const step = tempProcess[cur];
+      cur += 1;
+      that.setState({
+        currentStep: step,
+      });
+    }
+  }
+
+
+  autoRun() {
+    auto = setInterval(that.nextStep, 500);
+    that.setState({
+      canNext: false,
+      canAuto: false,
+      canStop: true,
+    });
+  }
+
+  stopAutoRun() {
+    if (auto !== undefined) {
+      clearInterval(auto);
+      auto = undefined;
+    }
+    that.setState({
+      canNext: true,
+      canAuto: true,
+      canStop: false,
+    });
+  }
+
+  stopAll() {
+    if (auto !== undefined) {
+      clearInterval(auto);
+      auto = undefined;
+    }
+    that.setState({
+      canNext: false,
+      canAuto: false,
+      canStop: false,
+    });
+  }
+
+
+  render() {
+    const originArr = this.state.originArr.map(item => {
+        return <Col key={item.position} className={styles.col} span={1}>{item.value}</Col>;
+      }
+    );
+    const currentStep = this.state.currentStep.arr.map((item, currentIndex) => {
+        if (this.state.currentStep.fixIndex > currentIndex) {
+          return <Col key={item.position} className={styles.colFix} span={1}>{item.value}</Col>;
         }
-        that.setState({
-            canNext: true,
-            canAuto: true,
-            canStop: false,
-        });
-    }
 
-    stopAll() {
-        if (auto !== undefined) {
-            clearInterval(auto);
-            auto = undefined;
+        if (this.state.currentStep.choose) {
+          if (currentIndex === this.state.currentStep.currentIndex) {
+            return <Col key={item.position} className={styles.chooseCol} span={1}>{item.value}</Col>;
+          }
         }
-        that.setState({
-            canNext: false,
-            canAuto: false,
-            canStop: false,
-        });
-    }
-
-
-    nextStep() {
-        let temp = that.state.arr.slice();
-        console.log(i, ":", j)
-        if (i > 0) {
-            if (p === 0) {
-                // 开始选择
-                if (j < temp.length - 1) {
-                    // 可以选择
-                    temp[j].choose = 1;
-                    temp[j + 1].choose = 1;
-                    p = 1;
-                    that.setState({
-                        arr: temp
-                    })
-                }
-            } else if (p === 1) {
-                if (temp[j].value <= temp[j + 1].value) {
-                    temp[j].choose = 0;
-                    temp[j + 1].choose = 0;
-                    p = 0;
-                    j++;
-                    if (j >= i) {
-                        temp[i].choose = 3;
-                        j = 0;
-                        i--;
-                    }
-                } else {
-                    temp[j].choose = 2;
-                    temp[j + 1].choose = 2;
-                    let value = temp[j].value;
-                    temp[j].value = temp[j + 1].value;
-                    temp[j + 1].value = value;
-                }
-                that.setState({
-                    arr: temp
-                });
-            }
-        } else if (i === 0) {
-            temp[i].choose = 3;
-            that.setState({
-                arr: temp,
-            });
-            that.stopAll();
+        if (this.state.currentStep.change) {
+          if (currentIndex === this.state.currentStep.currentIndex) {
+            return <Col key={item.position} className={styles.colChange} span={1}>{item.value}</Col>;
+          }
         }
-
-    }
-
-
-    render() {
-        const arrCol = this.state.arr.map(item => {
-                if (item.choose === 0) {
-                    return <Col className={styles.col} span={1}>{item.value}</Col>
-                } else if (item.choose === 1) {
-                    return <Col className={styles.chooseCol} span={1}>{item.value}</Col>
-                } else if (item.choose === 2) {
-                    return <Col className={styles.colSwap} span={1}>{item.value}</Col>
-                } else {
-                    return <Col className={styles.colFix} span={1}>{item.value}</Col>
-                }
-            }
-        );
-        return (
-            <PageContainer>
-                <Card>
-                    <Row>
-                        <Col span={2}>
-                            <Button
-                                icon={<StepForwardOutlined/>}
-                                type="primary"
-                                disabled={!this.state.canNext}
-                                onClick={() => {
-                                    that.nextStep();
-                                }}>下一步</Button>
-                        </Col>
-                        <Col span={2}>
-                            <Button
-                                icon={<PlayCircleOutlined/>}
-                                type="primary"
-                                disabled={!this.state.canAuto}
-                                onClick={() => {
-                                    that.autoRun();
-                                }}>自动</Button>
-                        </Col>
-                        <Col span={2}>
-                            <Button
-                                icon={<PauseCircleOutlined/>}
-                                type="primary"
-                                danger
-                                disabled={!this.state.canStop}
-                                onClick={() => {
-                                    that.stopAutoRun();
-                                }}>暂停</Button>
-                        </Col>
-                        <Col span={2}>
-                            <Button
-                                icon={<RedoOutlined/>}
-                                type="primary"
-                                onClick={() => {
-                                    that.newRound();
-                                }}>再来一遍</Button>
-                        </Col>
-                    </Row>
-                </Card>
-                <Card className={styles.dataCard}>
-                    <Row className={styles.dataRow} justify="space-around">
-                        {arrCol}
-                    </Row>
-                </Card>
-            </PageContainer>
-        );
-    }
-};
+        if (this.state.currentStep.swap) {
+          if (currentIndex === this.state.currentStep.minIndex) {
+            return <Col key={item.position} className={styles.colSwap} span={1}>{item.value}</Col>;
+          }
+          if (currentIndex === this.state.currentStep.fixIndex) {
+            return <Col key={item.position} className={styles.colSwap} span={1}>{item.value}</Col>;
+          }
+        }
+        return <Col key={item.position} className={styles.col} span={1}>{item.value}</Col>;
+      }
+    );
+    return (
+      <PageContainer>
+        <Card>
+          <Row>
+            <Col span={2}>
+              <Button
+                icon={<StepForwardOutlined/>}
+                type="primary"
+                disabled={!this.state.canNext}
+                onClick={() => {
+                  that.nextStep();
+                }}>下一步</Button>
+            </Col>
+            <Col span={2}>
+              <Button
+                icon={<PlayCircleOutlined/>}
+                type="primary"
+                disabled={!this.state.canAuto}
+                onClick={() => {
+                  that.autoRun();
+                }}>自动</Button>
+            </Col>
+            <Col span={2}>
+              <Button
+                icon={<PauseCircleOutlined/>}
+                type="primary"
+                danger
+                disabled={!this.state.canStop}
+                onClick={() => {
+                  that.stopAutoRun();
+                }}>暂停</Button>
+            </Col>
+            <Col span={2}>
+              <Button
+                icon={<RedoOutlined/>}
+                type="primary"
+                onClick={() => {
+                  that.newRound();
+                }}>再来一遍</Button>
+            </Col>
+          </Row>
+        </Card>
+        <Card className={styles.dataCard} title={"原始数组"}>
+          <Row className={styles.dataRow} justify="space-around">
+            {originArr}
+          </Row>
+        </Card>
+        <Card className={styles.dataCard} title={"排序数组"}>
+          <Row className={styles.dataRow} justify="space-around">
+            {currentStep}
+          </Row>
+        </Card>
+        <Card className={styles.dataCard} title={"当前最小值"}>
+          <Row className={styles.dataRow} justify="center">
+            <Col className={this.state.currentStep.change ? styles.colChange : styles.col}
+                 span={2}>下标:{this.state.currentStep.minIndex}</Col>
+            <Col className={this.state.currentStep.change ? styles.colChange : styles.col}
+                 span={2}>值:{this.state.currentStep.minValue}</Col>
+          </Row>
+        </Card>
+      </PageContainer>
+    )
+  }
+}
 
 export default Bubble;
