@@ -1,5 +1,5 @@
 import {PageContainer} from '@ant-design/pro-layout';
-import {Card, Row, Col, Grid, Button} from 'antd';
+import {Card, Row, Col, Button} from 'antd';
 import React, {Component} from 'react';
 import styles from './index.less';
 import {StepForwardOutlined, PlayCircleOutlined, PauseCircleOutlined, RedoOutlined} from '@ant-design/icons';
@@ -19,7 +19,7 @@ const initStep = {
   swap: false,
 };
 
-class Bubble extends Component {
+class SelectSort extends Component {
   state = {
     originArr: [],
     process: [],
@@ -295,4 +295,4 @@ class Bubble extends Component {
   }
 }
 
-export default Bubble;
+export default SelectSort;

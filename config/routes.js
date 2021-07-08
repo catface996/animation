@@ -43,12 +43,12 @@ export default [
             icon: "smile",
             component: "./algorithm/sort/select",
           },
-          // {
-          //   path: "/algorithm/sort/insert",
-          //   name: "insert",
-          //   icon: "smile",
-          //   component: "./algorithm/sort/insert",
-          // },
+          {
+            path: "/algorithm/sort/insert",
+            name: "insert",
+            icon: "smile",
+            component: "./algorithm/sort/insert",
+          },
           // {
           //   path: "/algorithm/sort/quick",
           //   name: "quick",
