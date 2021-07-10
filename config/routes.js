@@ -49,12 +49,12 @@ export default [
             icon: "smile",
             component: "./algorithm/sort/insert",
           },
-          // {
-          //   path: "/algorithm/sort/quick",
-          //   name: "quick",
-          //   icon: "smile",
-          //   component: "./algorithm/sort/quick",
-          // },
+          {
+            path: "/algorithm/sort/quick",
+            name: "quick",
+            icon: "smile",
+            component: "./algorithm/sort/quick",
+          },
           // {
           //   path: "/algorithm/sort/merge",
           //   name: "merge",
