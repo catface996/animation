@@ -9,7 +9,7 @@ let that;
 let auto;
 let current = 0;
 
-class Bubble extends Component {
+class QuickSort extends Component {
 
   state = {
     originArr: [],
@@ -369,4 +369,4 @@ class Bubble extends Component {
 
 };
 
-export default Bubble;
+export default QuickSort;

@@ -21,7 +21,7 @@ const sleep = (numberMillis) => {
     }
 }
 
-class Bubble extends Component {
+class HeapSort extends Component {
     state = {
         arr: [],
         canNext: true,
@@ -247,4 +247,4 @@ class Bubble extends Component {
     }
 };
 
-export default Bubble;
+export default HeapSort;
