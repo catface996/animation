@@ -107,20 +107,15 @@ class Bubble extends Component {
     let cur = L;
     let tempNode;
 
-    tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-    process.push(tempNode);
-
     while (cur < more) {
 
       // 标记当前选择的节点
-      sortArr[cur].state = 1;
-      tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
+      tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth, 1);
       process.push(tempNode);
 
       if (sortArr[cur].value < pivotValue) {
         // 标记当前节点小于 标尺值
-        sortArr[cur].state = 2;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
+        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth, 21);
         process.push(tempNode);
 
         less += 1;
@@ -128,22 +123,12 @@ class Bubble extends Component {
         sortArr[less].value = sortArr[cur].value;
         sortArr[cur].value = lessValue;
 
-        // 标记交换偶的情况
-        sortArr[cur].state = 4;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-        process.push(tempNode);
-
-        // 还原现场
-        sortArr[cur].state = 0;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-        process.push(tempNode);
         cur += 1;
 
       } else if (sortArr[cur].value > pivotValue) {
 
         // 标记当前值大于标尺值
-        sortArr[cur].state = 2;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
+        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth, 31);
         process.push(tempNode);
 
         more -= 1;
@@ -151,26 +136,9 @@ class Bubble extends Component {
         sortArr[more].value = sortArr[cur].value;
         sortArr[cur].value = moreValue;
 
-        // 标记交换偶的情况
-        sortArr[cur].state = 4;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-        process.push(tempNode);
-
-        // 还原现场
-        sortArr[cur].state = 0;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-        process.push(tempNode);
-
       } else {
 
-        // 标记当前值等于标尺值
-        sortArr[cur].state = 3;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
-        process.push(tempNode);
-
-        // 还原现场
-        sortArr[cur].state = 0;
-        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth);
+        tempNode = that.buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth, 41);
         process.push(tempNode);
 
         cur += 1;
@@ -189,16 +157,7 @@ class Bubble extends Component {
     process.push(tempNode);
   }
 
-  autoRun() {
-    auto = setInterval(that.nextStep, 500);
-    that.setState({
-      canNext: false,
-      canAuto: false,
-      canStop: true,
-    });
-  }
-
-  buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth) {
+  buildStackNode(sortArr, L, R, less, more, cur, pivot, pivotValue, depth, op) {
     const result = {
       sortArr: that.copySortArr(sortArr),
       pivot,
@@ -209,6 +168,7 @@ class Bubble extends Component {
       more,
       cur,
       depth,
+      op,
     }
     return result;
   }
@@ -224,6 +184,7 @@ class Bubble extends Component {
       more: stackNode.more,
       cur: stackNode.cur,
       depth: stackNode.depth,
+      op: stackNode.op,
     }
   }
 
@@ -246,6 +207,14 @@ class Bubble extends Component {
     return result;
   }
 
+  autoRun() {
+    auto = setInterval(that.nextStep, 500);
+    that.setState({
+      canNext: false,
+      canAuto: false,
+      canStop: true,
+    });
+  }
 
   stopAutoRun() {
     if (auto !== undefined) {
@@ -291,7 +260,7 @@ class Bubble extends Component {
     );
 
     const sortArr = [];
-    for (let i = this.state.currentSnapshot.length-1; i >=0 ; i-=1) {
+    for (let i = this.state.currentSnapshot.length - 1; i >= 0; i -= 1) {
       const item = this.state.currentSnapshot[i];
       const cols = item.sortArr.map(node => {
         let st = ``;
@@ -301,7 +270,21 @@ class Bubble extends Component {
         } else {
           st += `${styles.chooseCol} `;
           if (node.position === item.cur) {
-            st += `${styles.curStyle} `;
+            if (item.op === 1) {
+              st += `${styles.curStyle} `;
+            }
+            if (item.op === 21) {
+              st += `${styles.lessStyle} `;
+              if (node.position === item.less + 1) {
+                st += `${styles.lessStyle} `;
+              }
+            }
+            if (item.op === 31) {
+              st += `${styles.moreStyle} `;
+              if (node.position === item.more + 1) {
+                st += `${styles.moreStyle} `;
+              }
+            }
           }
           if (node.position >= item.more) {
             st += `${styles.moreStyle} `;
@@ -309,18 +292,33 @@ class Bubble extends Component {
           if (node.position <= item.less) {
             st += `${styles.lessStyle} `;
           }
+          if (node.position <= item.cur && node.value === item.pivotValue) {
+            st += `${styles.colFix} `;
+          }
         }
         return (<Col key={node.position} className={st} span={1}>{node.value}</Col>);
       });
 
-      const card =  (
+      const titleStr = [];
+      titleStr.push(<font color="black">{`depth=${item.depth}; L=${item.L}; R=${item.R}; `}</font>);
+      titleStr.push(<font color="orange">{`pivotValue=${item.pivotValue}; `}</font>);
+      titleStr.push(<font color="lightgreen">{`less=${item.less}; `}</font>);
+      titleStr.push(<font color="#1890ff">{`cur=${item.cur}; `}</font>);
+      titleStr.push(<font color="mediumseagreen">{`more=${item.more}; `}</font>);
+      const card = (
         <Card key={i} className={styles.dataCard}
-              title={`depth=${item.depth}; pivotValue=${item.pivotValue}; less=${item.less
-              }; L=${item.L}; cur=${item.cur}; R=${item.R}; more=${item.more}`}>
+              title={titleStr}>
           <Row key={i} className={styles.dataRow} justify="space-around">
             {cols}
           </Row>
         </Card>
+      // <Card key={i} className={styles.dataCard}
+      //       title={`depth=${item.depth}; pivotValue=${item.pivotValue}; less=${item.less
+      //       }; L=${item.L}; cur=${item.cur}; R=${item.R}; more=${item.more}`}>
+      //   <Row key={i} className={styles.dataRow} justify="space-around">
+      //     {cols}
+      //   </Row>
+      // </Card>
       );
       sortArr.push(card);
     }
@@ -366,7 +364,7 @@ class Bubble extends Component {
             </Col>
           </Row>
         </Card>
-        <Card className={styles.dataCard}>
+        <Card className={styles.dataCard} title={"原始数组"}>
           <Row className={styles.dataRow} justify="space-around">
             {originArr}
           </Row>
