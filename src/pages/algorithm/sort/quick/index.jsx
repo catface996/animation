@@ -312,13 +312,6 @@ class Bubble extends Component {
             {cols}
           </Row>
         </Card>
-      // <Card key={i} className={styles.dataCard}
-      //       title={`depth=${item.depth}; pivotValue=${item.pivotValue}; less=${item.less
-      //       }; L=${item.L}; cur=${item.cur}; R=${item.R}; more=${item.more}`}>
-      //   <Row key={i} className={styles.dataRow} justify="space-around">
-      //     {cols}
-      //   </Row>
-      // </Card>
       );
       sortArr.push(card);
     }
