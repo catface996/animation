@@ -69,6 +69,19 @@ export default [
           // },
         ],
       },
+      {
+        path: "/algorithm/path",
+        name: "path",
+        icon: "smile",
+        routes: [
+          {
+            path: "/algorithm/path/aStar",
+            name: "aStar",
+            icon: "smile",
+            component: "./algorithm/path/aStar",
+          },
+        ],
+      },
     ],
   },
   {

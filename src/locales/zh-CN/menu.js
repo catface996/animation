@@ -58,4 +58,7 @@ export default {
   'menu.algorithm.sort.merge': '归并排序',
   'menu.algorithm.sort.heap': '堆排序',
   'menu.algorithm.heap': '堆',
+  'menu.algorithm.path': '路径规划',
+  'menu.algorithm.path.aStar': 'A *',
+
 };
